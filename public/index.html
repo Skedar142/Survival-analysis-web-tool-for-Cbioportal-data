@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survival Analysis Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="background-shape shape-1"></div>
+    <div class="background-shape shape-2"></div>
+    
+    <div class="container">
+        <header>
+            <h1>Survival Analysis Tool</h1>
+            <p>Run Kaplan-Meier plots and log-rank tests effortlessly.</p>
+        </header>
+
+        <main>
+            <div class="card form-card">
+                <h2>Analysis Configuration</h2>
+                <form id="analysisForm">
+                    
+                    <div id="tcgaGroup" class="form-group">
+                        <label for="tcga_project">TCGA Project ID</label>
+                        <input type="text" id="tcga_project" name="tcga_project" class="form-control" placeholder="e.g., TCGA-OV" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="gene">Gene Symbol (Required)</label>
+                            <input type="text" id="gene" name="gene" class="form-control" placeholder="e.g., WWC1" required>
+                        </div>
+                        <div class="form-group half">
+                            <label for="split_method">Split Method</label>
+                            <select id="split_method" name="split_method" class="form-control">
+                                <option value="median">Median</option>
+                                <option value="mean">Mean</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group half">
+                            <label for="cases">Cases Filter (List of IDs)</label>
+                            <textarea id="cases" name="cases" class="form-control" rows="4" placeholder="TCGA-13-1489&#10;TCGA-29-1691"></textarea>
+                        </div>
+                        <div class="form-group half">
+                            <label for="id_col">ID Column (Used with Cases Filter)</label>
+                            <input type="text" id="id_col" name="id_col" class="form-control" value="patient_id">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn-primary">
+                        <span class="btn-text">Run Analysis</span>
+                        <div class="spinner hidden"></div>
+                    </button>
+                </form>
+            </div>
+
+            <div class="card results-card hidden" id="resultsContainer">
+                <h2>Analysis Results</h2>
+                
+                <div class="tabs">
+                    <button class="tab-btn active" data-target="plotTab">Kaplan-Meier Plot</button>
+                    <button class="tab-btn" data-target="statsTab">Statistical Summary</button>
+                    <button class="tab-btn" data-target="logsTab">Console Logs</button>
+                </div>
+                
+                <div class="tab-content active" id="plotTab">
+                    <iframe id="pdfViewer" src="" class="pdf-viewer"></iframe>
+                    <a id="downloadPdf" href="" download="km_plot.pdf" class="btn-secondary">Download PDF</a>
+                </div>
+                
+                <div class="tab-content" id="statsTab">
+                    <pre id="statsText" class="code-block"></pre>
+                    <a id="downloadStats" href="" download="survival_results.txt" class="btn-secondary">Download Text</a>
+                </div>
+                
+                <div class="tab-content" id="logsTab">
+                    <pre id="consoleLogs" class="code-block"></pre>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
