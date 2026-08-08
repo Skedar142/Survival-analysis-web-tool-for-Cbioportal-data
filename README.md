@@ -7,7 +7,7 @@
 
 A lightweight, visually appealing web interface for running Kaplan-Meier survival analysis and log-rank tests locally. 
 
-This tool is designed to run entirely on **your own machine** (using your local processor and memory) with zero external server dependencies, making it perfect for secure and private data analysis. **Fully compatible with Windows, Mac, and Linux.**
+This tool is designed to run entirely on **your own machine** (using your local processor and memory) with zero external server dependencies, making it perfect for secure and private data analysis. **Fully compatible with Mac, and Linux.**
 
 ## ✨ Features
 * **Cross-Platform Compatibility**: Works flawlessly on Windows, macOS, and Linux (including Zorin OS and Ubuntu).
@@ -27,11 +27,6 @@ To run this tool on your machine, you must have the following installed:
 
 Before running the app for the first time, you need to install the required R packages (`optparse`, `survival`, `survminer`, `BiocManager`, `TCGAbiolinks`).
 
-**For Windows:**
-Double-click the `install_dependencies.bat` file, or run it via Command Prompt:
-```cmd
-install_dependencies.bat
-```
 
 **For Mac / Linux (Ubuntu, Zorin OS, etc.):**
 Open your terminal and run the shell script:
@@ -53,12 +48,23 @@ chmod +x install_dependencies.sh
       ```bash
       python3 server.py
       ```
-4. **Open the App**: Open your web browser and go to [http://localhost:3000](http://localhost:3000). *(Do not open the `index.html` file directly in your browser, as it requires the server to communicate with the backend).*
+4. **Open the App**: Open your web browser and go to [http://localhost:3000](http://localhost:3000). *(Do not open the `index.html` file directly icohertn your browser, as it requires the server to communicate with the backend).*
 
 ## 💡 Usage
 
 * **TCGA Download**: Select the "Download TCGA" option to dynamically fetch project data (e.g., `TCGA-OV`, `TCGA-BRCA`). 
 * *Note: Downloading GDC data can take several minutes depending on your internet connection and the size of the dataset.*
-
+t 
 ---
 *Built for local, secure, and beautiful bioinformatics analysis.*
+
+It is strictly built for TCGA data 
+For getting TCGA CASE IDs, go to the gdc data portal and prepare a cohort <img width="755" height="145" alt="image" src="https://github.com/user-attachments/assets/5d43aa64-0384-4082-8d8e-8913fbaa858b" /> 
+
+<img width="1378" height="48" alt="image" src="https://github.com/user-attachments/assets/008be774-f617-48f4-85dd-26dd8ca50e96" />
+Select these filters according to your Experiment and and save it.
+then go to Repo and then again apply the filters for the survival analysis only select Tumor tissue.
+
+click add to cart and go to cart.
+<img width="1842" height="1048" alt="image" src="https://github.com/user-attachments/assets/9e8d6f29-3ca7-4699-9f06-423ee3f94101" />
+Download the Sample sheet and open the TSV file and copy cases column and paste it in the web tool and Run analysis.
