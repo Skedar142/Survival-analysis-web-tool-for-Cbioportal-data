@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cBioPortal Survival Analysis</title>
+    <meta name="description" content="Kaplan-Meier survival analysis for any gene across all cBioPortal cancer studies.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=2">
+</head>
+<body>
+    <!-- Ambient glow blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <!-- Top Nav Bar -->
+    <nav class="navbar">
+        <div class="nav-inner">
+            <div class="nav-brand">
+                <svg class="nav-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+                <span class="nav-title">KM Survival <span class="nav-sub">Analyzer</span></span>
+            </div>
+            <div class="nav-links">
+                <a href="https://www.cbioportal.org" target="_blank" class="nav-link" title="cBioPortal public data API">cBioPortal ↗</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-inner">
+            <div class="hero-tag">
+                <span class="dot"></span>
+                Data sourced from cBioPortal Public API
+            </div>
+            <h1 class="hero-title">
+                Kaplan-Meier Survival Analysis<br>
+                <span class="gradient-text">Across All Cancer Types</span>
+            </h1>
+            <p class="hero-desc">
+                Analyze gene expression, mutations &amp; copy number from <strong id="studyCountDesc">500+</strong> public cancer datasets
+                and generate Kaplan-Meier plots with log-rank statistics — all via the free cBioPortal public API.
+            </p>
+            <div class="hero-stats">
+                <div class="stat"><span class="stat-num" id="studyCount">—</span><span class="stat-label">Studies</span></div>
+                <div class="stat-divider"></div>
+                <div class="stat"><span class="stat-num" id="totalSamples">—</span><span class="stat-label">Total Samples</span></div>
+                <div class="stat-divider"></div>
+                <div class="stat"><span class="stat-num">Live</span><span class="stat-label">Public API</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Layout -->
+    <main class="main-layout">
+
+        <!-- LEFT: Config Panel -->
+        <div class="panel config-panel">
+            <div class="panel-header">
+                <div class="panel-icon">⚙</div>
+                <h2 class="panel-title">Analysis Setup</h2>
+            </div>
+
+            <form id="analysisForm" novalidate>
+
+
+                <!-- Step 1: Study -->
+                <div class="step-block">
+                    <div class="step-label"><span class="step-num">1</span> Select Cancer Study</div>
+                    <input type="hidden" id="study_id" name="study_id">
+                    <button type="button" id="openBrowserBtn" class="browser-open-btn">
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="9" cy="9" r="6"/><path d="m15 15 3 3"/></svg>
+                        <span id="browserBtnLabel">Browse &amp; Select a Study…</span>
+                    </button>
+                    <div id="studyBadge" class="selected-study hidden">
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" class="check-icon"><polyline points="4 10 8 14 16 6"/></svg>
+                        <span id="studyBadgeText"></span>
+                        <button type="button" id="clearStudy" class="clear-btn">✕</button>
+                    </div>
+                    <p id="studyHint" class="hint-text">Loading studies…</p>
+                </div>
+
+
+                <!-- Step 2: Data Type & Profile -->
+                <div class="step-block">
+                    <div class="step-label"><span class="step-num">2</span> Data Type &amp; Profile</div>
+                    <div class="two-col" style="margin-bottom: 0.8rem;">
+                        <div class="field-group">
+                            <label class="field-label" for="datatype">Data Type</label>
+                            <div class="select-wrapper">
+                                <select id="datatype" name="datatype" class="styled-select">
+                                    <option value="mRNA">mRNA Expression</option>
+                                    <option value="MUT">Mutation (MUT)</option>
+                                    <option value="CNA">Copy Number (CNA)</option>
+                                </select>
+                                <svg class="select-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="5 8 10 13 15 8"/></svg>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label" for="profile_type">Profile <span class="hint-inline">(auto-detects by default)</span></label>
+                            <div class="select-wrapper">
+                                <select id="profile_type" name="profile_type" class="styled-select">
+                                    <option value="">Auto-detect (recommended)</option>
+                                </select>
+                                <svg class="select-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="5 8 10 13 15 8"/></svg>
+                            </div>
+                        </div>
+                    </div>
+                    <p id="profileHint" class="hint-text hidden"></p>
+                </div>
+
+                <!-- Step 3: Gene + Split + Endpoint -->
+                <div class="step-block">
+                    <div class="step-label"><span class="step-num">3</span> Gene &amp; Analysis Config</div>
+                    <div class="two-col">
+                        <div class="field-group">
+                            <label class="field-label" for="gene">Gene Symbol <span class="req">*</span></label>
+                            <input type="text" id="gene" name="gene" class="field-input gene-input"
+                                   placeholder="e.g. TP53, WWC1, BRCA1" required autocomplete="off">
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label" for="endpoint">Clinical Endpoint</label>
+                            <div class="select-wrapper">
+                                <select id="endpoint" name="endpoint" class="styled-select">
+                                    <option value="OS">Overall Survival (OS)</option>
+                                    <option value="PFS">Progression/Disease-Free (PFS/DFS)</option>
+                                </select>
+                                <svg class="select-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="5 8 10 13 15 8"/></svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-group" id="splitGroup" style="margin-top: 1rem;">
+                        <label class="field-label" for="split_method">Stratification / Split Method (for mRNA)</label>
+                        <div class="toggle-group">
+                            <input type="radio" id="split_median" name="split_method" value="median" checked class="toggle-radio">
+                            <label for="split_median" class="toggle-label">Median</label>
+                            <input type="radio" id="split_mean" name="split_method" value="mean" class="toggle-radio">
+                            <label for="split_mean" class="toggle-label">Mean</label>
+                            <input type="radio" id="split_optimal" name="split_method" value="optimal" class="toggle-radio">
+                            <label for="split_optimal" class="toggle-label">Auto / Optimal</label>
+                        </div>
+                        <p class="hint-text" style="margin-top: 4px;">Optimal tests all cutoffs between 25th-75th percentiles (KMplot style).</p>
+                    </div>
+                    <div class="field-group hidden" id="cnaGroup" style="margin-top: 1rem;">
+                        <label class="field-label" for="cna_mode">CNA Grouping Mode</label>
+                        <div class="select-wrapper">
+                            <select id="cna_mode" name="cna_mode" class="styled-select">
+                                <option value="all">All (Deep Del, Shallow Del, Diploid, Gain, Amp)</option>
+                                <option value="strict">Strict (Deep Del, Diploid, Amp)</option>
+                                <option value="three">Three (Deleted, Diploid, Amplified)</option>
+                                <option value="amp">Amplified vs Rest</option>
+                                <option value="del">Deleted vs Rest</option>
+                                <option value="altered">Altered vs Diploid</option>
+                            </select>
+                            <svg class="select-arrow" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2"><polyline points="5 8 10 13 15 8"/></svg>
+                        </div>
+                        <p class="hint-text" style="margin-top: 4px;">Choose how to combine GISTIC copy number categories.</p>
+                    </div>
+                </div>
+
+
+
+
+                <button type="submit" id="submitBtn" class="run-btn">
+                    <span class="run-btn-icon">▶</span>
+                    <span class="run-btn-text">Run Analysis</span>
+                    <div class="run-spinner hidden"></div>
+                </button>
+
+            </form>
+        </div>
+
+        <!-- RIGHT: Results Panel -->
+        <div class="panel results-panel" id="resultsPanel">
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState">
+                <div class="empty-icon">
+                    <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M8 48 L8 16 L20 28 L32 8 L44 32 L56 20 L56 48 Z" stroke-linejoin="round"/>
+                        <circle cx="32" cy="8" r="3" fill="currentColor"/>
+                    </svg>
+                </div>
+                <h3>No results yet</h3>
+                <p>Configure a study and gene on the left, then click <strong>Run Analysis</strong>.</p>
+            </div>
+
+            <!-- Results (hidden until analysis runs) -->
+            <div id="resultsContent" class="hidden">
+                <div class="results-header">
+                    <h2 class="panel-title">Results</h2>
+                    <div class="tab-bar">
+                        <button class="tab active" data-target="plotTab">KM Plot</button>
+                        <button class="tab" data-target="statsTab">Statistics</button>
+                        <button class="tab" data-target="logsTab">Logs</button>
+                    </div>
+                </div>
+
+                <div class="tab-pane active" id="plotTab">
+                    <iframe id="pdfViewer" src="" class="pdf-frame"></iframe>
+                    <a id="downloadPdf" href="" download="km_plot.pdf" class="dl-btn">⬇ Download PDF</a>
+                </div>
+
+                <div class="tab-pane" id="statsTab">
+                    <pre id="statsText" class="stats-block"></pre>
+                    <a id="downloadStats" href="" download="survival_results.txt" class="dl-btn">⬇ Download TXT</a>
+                </div>
+
+                <div class="tab-pane" id="logsTab">
+                    <pre id="consoleLogs" class="stats-block logs-block"></pre>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Progress overlay -->
+    <div id="progressOverlay" class="progress-overlay hidden">
+        <div class="progress-card">
+            <div class="progress-ring"></div>
+            <p class="progress-title">Running Analysis</p>
+            <p class="progress-sub" id="progressMsg">Connecting to cBioPortal…</p>
+        </div>
+    </div>
+
+    <script src="app.js?v=2"></script>
+
+    <!-- Study Browser Modal -->
+    <div id="studyModal" class="study-modal hidden" role="dialog" aria-modal="true" aria-label="Select Cancer Study">
+        <div class="study-modal-overlay" id="studyModalOverlay"></div>
+        <div class="study-modal-dialog">
+            <!-- Modal Header -->
+            <div class="smodal-header">
+                <div class="smodal-title-row">
+                    <h3 class="smodal-title">Select Cancer Study</h3>
+                    <span id="modalStudyCount" class="smodal-count"></span>
+                    <button type="button" id="closeModalBtn" class="smodal-close" aria-label="Close">&#x2715;</button>
+                </div>
+                <div class="smodal-toolbar">
+                    <div class="smodal-quickbtn-row">
+                        <button type="button" class="quick-btn" data-filter="tcga_pan_can_atlas">TCGA PanCancer Atlas 2018</button>
+                        <button type="button" class="quick-btn" data-filter="tcga">All TCGA</button>
+                        <button type="button" class="quick-btn" data-filter="msk">All MSK</button>
+                        <button type="button" class="quick-btn" data-filter="">Show All</button>
+                    </div>
+                    <div class="smodal-datatype-row" style="margin-top: 8px; margin-bottom: 8px; display: flex; gap: 1rem; align-items: center; font-size: 0.85rem; color: #475569;">
+                        <span style="font-weight: 500; color: #1e293b;">Required Data:</span>
+                        <label style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                            <input type="checkbox" id="filterRNA" class="dt-checkbox"> RNA-Seq
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                            <input type="checkbox" id="filterMUT" class="dt-checkbox"> Mutations
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                            <input type="checkbox" id="filterCNA" class="dt-checkbox"> CNA
+                        </label>
+                    </div>
+                    <div class="smodal-search-row">
+                        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="9" cy="9" r="6"/><path d="m15 15 3 3"/></svg>
+                        <input type="text" id="modalSearchInput" placeholder="Search by name, ID, or institution&hellip;" autocomplete="off" spellcheck="false">
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Body -->
+            <div class="smodal-body">
+                <div class="smodal-sidebar" id="categorySidebar"></div>
+                <div class="smodal-studies" id="studyListPanel"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
