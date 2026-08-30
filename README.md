@@ -1,21 +1,18 @@
-# Survival-analysis-web-tool-for-TCGA-data
-
 # Survival Analysis Web Tool
 
 ![Compatibility](https://img.shields.io/badge/Platform-Windows%20%7C%20Mac%20%7C%20Linux-success)
 ![Python](https://img.shields.io/badge/Python-3.x-yellow)
 ![R](https://img.shields.io/badge/R-4.x-blue)
 
-A lightweight, visually appealing web interface for running Kaplan-Meier survival analysis and log-rank tests locally.
+A lightweight, visually appealing web interface for running Kaplan-Meier survival analysis and log-rank tests locally. 
 
-This tool is designed to run entirely on **your own machine** (using your local processor and memory) with zero external server dependencies, making it perfect for secure and private data analysis. **Fully compatible with Mac, and Linux.**
+This tool is designed to run entirely on **your own machine** (using your local processor and memory) with zero external server dependencies, making it perfect for secure and private data analysis. **Fully compatible with Windows, Mac, and Linux.**
 
 ## ✨ Features
-
 * **Cross-Platform Compatibility**: Works flawlessly on Windows, macOS, and Linux (including Zorin OS and Ubuntu).
 * **Zero-Dependency Backend**: Uses Python 3's built-in HTTP server module. No need to install Node.js, `npm`, or heavy `pip` frameworks.
 * **Beautiful UI**: A responsive, dark-mode glassmorphism interface built with Vanilla CSS and JS.
-* **TCGA Integration**: Optionally download and analyze raw RNA-Seq and clinical data directly from the GDC database using `TCGAbiolinks`.
+* **cBioPortal Integration**: Optionally download and analyze RNA-Seq, mutation, CNA, and clinical data directly from cBioPortal API.
 * **Real-time Results**: View the generated Kaplan-Meier PDF plots and statistical log-rank summaries directly in the browser.
 
 ## ⚙️ Prerequisites
@@ -27,12 +24,16 @@ To run this tool on your machine, you must have the following installed:
 
 ### 📦 Install R Dependencies
 
-Before running the app for the first time, you need to install the required R packages (`optparse`, `survival`, `survminer`, `BiocManager`, `TCGAbiolinks`).
+Before running the app for the first time, you need to install the required R packages (`optparse`, `survival`, `survminer`, `httr`, `jsonlite`, `ggplot2`).
+
+**For Windows:**
+Double-click the `install_dependencies.bat` file, or run it via Command Prompt:
+```cmd
+install_dependencies.bat
+```
 
 **For Mac / Linux (Ubuntu, Zorin OS, etc.):**
-
 Open your terminal and run the shell script:
-
 ```bash
 chmod +x install_dependencies.sh
 ./install_dependencies.sh
@@ -41,52 +42,22 @@ chmod +x install_dependencies.sh
 ## 🚀 How to Run
 
 1. **Clone or Download** this repository to your computer.
-
 2. **Open a Terminal** (or Command Prompt on Windows) and navigate into the project folder.
-
 3. **Start the Server**:
-
-   * **Windows**:
-
-     ```cmd
-     python server.py
-     ```
-
-   * **Mac / Linux**:
-
-     ```bash
-     python3 server.py
-     ```
-
-4. **Open the App**: Open your web browser and go to http://localhost:3000.
-
-   *(Do not open the `index.html` file directly in your browser, as it requires the server to communicate with the backend).*
+    * **Windows**:
+      ```cmd
+      python server.py
+      ```
+    * **Mac / Linux**:
+      ```bash
+      python3 server.py
+      ```
+4. **Open the App**: Open your web browser and go to [http://localhost:3000](http://localhost:3000). *(Do not open the `index.html` file directly in your browser, as it requires the server to communicate with the backend).*
 
 ## 💡 Usage
 
-* **TCGA Download**: Select the "Download TCGA" option to dynamically fetch project data (e.g., `TCGA-OV`, `TCGA-BRCA`).
-* *Note: Downloading GDC data can take several minutes depending on your internet connection and the size of the dataset.*
+* **cBioPortal Download**: Select the "Download from cBioPortal" option to dynamically fetch study data. 
+* *Note: Downloading data can take a moment depending on your internet connection and the size of the dataset.*
 
 ---
-
 *Built for local, secure, and beautiful bioinformatics analysis.*
-
-It is strictly built for TCGA data.
-
-For getting TCGA CASE IDs, go to the GDC Data Portal and prepare a cohort.
-
-<img width="755" height="145" alt="image" src="https://github.com/user-attachments/assets/5d43aa64-0384-4082-8d8e-8913fbaa858b" />
-
-<br><br>
-
-<img width="1378" height="48" alt="image" src="https://github.com/user-attachments/assets/008be774-f617-48f4-85dd-26dd8ca50e96" />
-
-Select these filters according to your experiment and save it.
-
-Then go to Repo and again apply the filters for the survival analysis. Only select Tumor Tissue.
-
-Click **Add to Cart** and go to Cart.
-
-<img width="1842" height="1048" alt="image" src="https://github.com/user-attachments/assets/9e8d6f29-3ca7-4699-9f06-423ee3f94101" />
-
-Download the Sample Sheet and open the TSV file. Copy the `cases` column and paste it into the web tool, then **Run Analysis**.
